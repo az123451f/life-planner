@@ -1,4 +1,3 @@
-```
 // --- Configuration & State ---
 const App = {
     currentProjectId: null,
@@ -716,4 +715,3 @@ function renderStickyNote(data) {
 
 // Start App
 initApp();
-```
