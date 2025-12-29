@@ -1,0 +1,679 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+    background: #f5f5f5;
+}
+
+/* Canvas */
+#canvas {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+    background: 
+        radial-gradient(circle, #ddd 1px, transparent 1px);
+    background-size: 30px 30px;
+    cursor: grab;
+}
+
+#canvas.dragging {
+    cursor: grabbing;
+}
+
+#world {
+    position: absolute;
+    width: 0;
+    height: 0;
+    transform-origin: 0 0;
+}
+
+/* Toolbar */
+#toolbar {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    padding: 12px 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+
+.tool-btn {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.tool-btn:hover {
+    background: #1d4ed8;
+}
+
+/* Task List - Simple Clean Design */
+.task-list {
+    position: absolute;
+    width: 300px;
+    background: white;
+    border-radius: 12px;
+    padding: 0;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    cursor: move;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+}
+
+.task-list-header {
+    padding: 16px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f9fafb;
+}
+
+.task-list-title {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: #111827;
+    font-size: 16px;
+    font-weight: 600;
+    outline: none;
+    padding: 0;
+}
+
+.task-list-title::placeholder {
+    color: #9ca3af;
+}
+
+.task-list-content {
+    padding: 12px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    margin-bottom: 6px;
+    background: #f9fafb;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.task-checkbox {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    border: 2px solid #d1d5db;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    background: white;
+    transition: all 0.15s;
+}
+
+.task-checkbox:hover {
+    border-color: #9ca3af;
+}
+
+.task-checkbox.checked {
+    background: #10b981;
+    border-color: #10b981;
+}
+
+.task-checkbox.checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.task-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    font-weight: 400;
+    color: #374151;
+    outline: none;
+    padding: 0;
+}
+
+.task-input.checked {
+    text-decoration: line-through;
+    color: #9ca3af;
+}
+
+.add-task-btn {
+    width: 100%;
+    padding: 12px;
+    margin: 12px;
+    margin-top: 6px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.add-task-btn:hover {
+    background: #1d4ed8;
+}
+
+/* Scrollbar */
+.task-list-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.task-list-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.task-list-content::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+}
+
+.task-list-content::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+}
+
+/* Note Board - Clean Design */
+.note-board {
+    position: absolute;
+    width: 340px;
+    height: 450px;
+    background: white;
+    border-radius: 12px;
+    padding: 0;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    cursor: move;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #e5e7eb;
+}
+
+.note-header {
+    padding: 16px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-radius: 12px 12px 0 0;
+}
+
+.note-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.note-type-select {
+    border: none;
+    background: #f3f4f6;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #4b5563;
+    cursor: pointer;
+    outline: none;
+}
+
+.note-date {
+    font-size: 12px;
+    color: #9ca3af;
+    font-weight: 500;
+}
+
+.note-title {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+    outline: none;
+    padding: 2px 0;
+}
+
+.note-title::placeholder {
+    color: #d1d5db;
+}
+
+/* Resize Handle */
+.resize-handle {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    cursor: nwse-resize;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.resize-handle::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid #cbd5e1;
+    border-bottom: 2px solid #cbd5e1;
+}
+
+/* Sections inside Note Board */
+.note-content {
+    flex: 1;
+    padding: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.note-section {
+    padding: 12px 16px;
+    border-bottom: 1px dashed #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.note-section:last-child {
+    border-bottom: none;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #4b5563;
+    background: #f3f4f6;
+    border: none;
+    border-radius: 4px;
+    padding: 2px 6px;
+    width: 100%;
+    outline: none;
+}
+
+.section-title::placeholder {
+    color: #9ca3af;
+}
+
+.section-textarea {
+    width: 100%;
+    min-height: 60px; /* Expands */
+    border: none;
+    resize: none;
+    outline: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #374151;
+    background: transparent;
+    overflow: hidden; /* Auto-growth handled by JS usually, or just scroll */
+}
+
+.add-section-btn {
+    margin: 10px 16px;
+    padding: 8px;
+    background: transparent;
+    border: 1px dashed #cbd5e1;
+    border-radius: 6px;
+    color: #6b7280;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.add-section-btn:hover {
+    border-color: #3b82f6;
+    color: #3b82f6;
+    background: #eff6ff;
+}
+
+/* Scrollbar for note content */
+.note-content::-webkit-scrollbar {
+    width: 6px;
+}
+.note-content::-webkit-scrollbar-thumb {
+    background: #e5e7eb;
+    border-radius: 3px;
+}
+
+
+/* Sticky Note */
+.sticky-note {
+    position: absolute;
+    width: 250px; /* Default width */
+    min-height: 250px;
+    background: #fef3c7; /* Default Yellow */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-radius: 2px;
+    padding: 0;
+    cursor: move;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Color Palette Bar & Drag Handle */
+.sticky-colors {
+    padding: 8px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    /* Always visible now to serve as a clear "Drag Here" area, 
+       but we keep it subtle or we can overlay it? 
+       Actually, let's make it a clear header strip for dragging. */
+    height: 32px; /* Fixed height for dragging */
+    background: rgba(0,0,0,0.03); /* Slight tint for header */
+}
+
+.color-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 1px solid rgba(0,0,0,0.1);
+    transition: transform 0.1s;
+}
+.color-dot:hover { transform: scale(1.2); }
+
+
+/* Colors */
+.sticky-yellow { background: #fef3c7 !important; }
+.sticky-yellow .sticky-textarea { background: #fef3c7; }
+
+.sticky-blue { background: #bae6fd !important; }
+.sticky-blue .sticky-textarea { background: #bae6fd; }
+
+.sticky-green { background: #bbf7d0 !important; }
+.sticky-green .sticky-textarea { background: #bbf7d0; }
+
+.sticky-pink { background: #fbcfe8 !important; }
+.sticky-pink .sticky-textarea { background: #fbcfe8; }
+
+.sticky-content {
+    flex: 1;
+    padding: 16px;
+    padding-top: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.sticky-textarea {
+    width: 100%;
+    height: 100%;
+    min-height: 200px;
+    border: none;
+    resize: none;
+    outline: none;
+    font-family: 'Caveat', 'Inter', cursive;
+    font-size: 24px;
+    line-height: 1.4;
+    color: #4b5563;
+    overflow: hidden; /* No scrollbars, we auto-grow */
+}
+
+/* Arrow Component */
+.arrow-item {
+    position: absolute;
+    cursor: move;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* No bg/shadow for arrow itself usually, just the shape */
+}
+
+.arrow-svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+}
+
+/* Rotation Handle */
+.rotate-handle {
+    position: absolute;
+    top: -25px; /* Stick out top */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 24px;
+    height: 24px;
+    background: white;
+    border: 1px solid #cbd5e1;
+    border-radius: 50%;
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 20;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.rotate-handle::after {
+    content: '⟳';
+    font-size: 14px;
+    color: #64748b;
+}
+
+.task-list:hover .rotate-handle,
+.note-board:hover .rotate-handle,
+.sticky-note:hover .rotate-handle,
+.arrow-item:hover .rotate-handle {
+    opacity: 1;
+}
+
+/* Connection line for rotation handle */
+/* Drag Handle Icon - Always Visible & Prominent */
+.drag-handle-icon {
+    position: absolute;
+    top: 6px; /* Moved INSIDE */
+    right: 6px; /* Moved INSIDE */
+    width: 28px;
+    height: 28px;
+    background: #3b82f6; /* Bright Blue */
+    border: 2px solid white;
+    border-radius: 50%;
+    cursor: move;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    z-index: 50; /* Super high priority */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: transform 0.2s;
+}
+
+.drag-handle-icon::after {
+    content: '✥';
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.drag-handle-icon:hover {
+    transform: scale(1.1);
+    background: #2563eb;
+}
+
+/* Ensure drag handle is positioned correctly in sticky notes */
+.sticky-note .drag-handle-icon {
+    right: 6px;
+}
+
+/* Delete Button - Always Visible */
+.delete-btn {
+    position: absolute;
+    top: 6px; /* Inside */
+    left: 6px; /* Inside */
+    width: 24px;
+    height: 24px;
+    background: #ef4444; /* Red */
+    border: 2px solid white;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    z-index: 50;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    font-family: sans-serif;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.delete-btn::after {
+    content: '×';
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 2px;
+}
+
+.delete-btn:hover {
+    background: #dc2626;
+    transform: scale(1.1);
+}
+
+/* sticky note positioning matches drag handle */
+.sticky-note .delete-btn {
+    top: 6px;
+    left: 6px;
+}
+
+/* --- Dashboard Styles --- */
+.dashboard-container {
+    padding: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.dashboard-header h1 {
+    font-size: 32px;
+    font-weight: 800;
+    color: #111827;
+    letter-spacing: -0.5px;
+}
+
+.primary-btn {
+    background: #2563eb;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    transition: transform 0.2s, background 0.2s;
+}
+
+.primary-btn:hover {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+}
+
+.project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.project-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid #e5e7eb;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.project-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+    border-color: #bfdbfe;
+}
+
+.project-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 8px;
+}
+
+.project-date {
+    font-size: 13px;
+    color: #9ca3af;
+}
+
+.delete-project-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 28px;
+    height: 28px;
+    background: #fee2e2;
+    color: #ef4444;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.project-card:hover .delete-project-btn {
+    opacity: 1;
+}
+
+.delete-project-btn:hover {
+    background: #ef4444;
+    color: white;
+}
+
+/* Utilities */
+.hidden {
+    display: none !important;
+}
+
+
+
+
+
